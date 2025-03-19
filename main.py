@@ -1,7 +1,8 @@
-from typing import List, Annotated
+from typing import List, Annotated, Optional
 
 from starlette import status
 from sqlalchemy.orm import Session
+from pydantic import BaseModel, Field
 from fastapi import FastAPI, Path, Depends, HTTPException
 
 from models import Base, Todos
@@ -27,6 +28,13 @@ def get_db():
 # Dependency injection
 db_dependency = Annotated[Session, Depends(get_db)]
 
+class TodoRequest(BaseModel):
+    title: str = Field(min_length=2)
+    description: str = Field(min_length=3, max_length=100)
+    priority: int = Field(gt=0, lt=6)
+    complete: Optional[bool] = False
+
+
 @app.get("/", status_code=status.HTTP_200_OK)
 async def read_all_todos(db: db_dependency):
     """Returns all the to-do tasks from the database"""
@@ -39,4 +47,10 @@ async def get_todo(db: db_dependency, todo_id: int = Path(gt=0)):
     if todo_task:
         return todo_task
     raise HTTPException(status_code=404, detail="Not found")
+
+@app.post("/new-todo/", status_code=status.HTTP_201_CREATED)
+async def create_todo(db: db_dependency, todo_request: TodoRequest) -> None:
+    new_todo = Todos(**todo_request.dict())
+    db.add(new_todo)
+    db.commit()
 
