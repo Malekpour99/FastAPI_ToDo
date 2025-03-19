@@ -50,6 +50,7 @@ async def get_todo(db: db_dependency, todo_id: int = Path(gt=0)):
 
 @app.post("/todo/", status_code=status.HTTP_201_CREATED)
 async def create_todo(db: db_dependency, todo_request: TodoRequest) -> None:
+    """Creates a new to-do task"""
     new_todo = Todos(**todo_request.dict())
     db.add(new_todo)
     db.commit()
@@ -60,6 +61,7 @@ async def update_todo(
         todo_request: TodoRequest,
         todo_id: int = Path(gt=0),
         ) -> None:
+    """Updates desired to-do task based on its ID and provided data"""
     todo_task = db.query(Todos).filter(Todos.id == todo_id).first()
     if not todo_task:
         raise HTTPException(status_code=404, detail="Not found")
@@ -77,6 +79,7 @@ async def delete_todo(
         db: db_dependency,
         todo_id: int = Path(gt=0),
         ) -> None:
+    """Deletes desired to-do task based on its ID"""
     todo_task = db.query(Todos).filter(Todos.id == todo_id).first()
     if not todo_task:
         raise HTTPException(status_code=404, detail="Not found")
