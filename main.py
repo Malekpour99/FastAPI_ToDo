@@ -7,12 +7,14 @@ from fastapi import FastAPI, Path, Depends, HTTPException
 
 from models import Base, Todos
 from database import engine, SessionLocal
+from routers import auth
 
 app = FastAPI()
 
 # Creating database if it doesn't exist
 Base.metadata.create_all(bind=engine)
 
+app.include_router(auth.router)
 
 def get_db():
     """
