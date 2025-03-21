@@ -1,26 +1,11 @@
-from typing import List, Annotated, Optional
+from typing import List, Optional
 
 from starlette import status
-from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
-from fastapi import APIRouter, Path, Depends, HTTPException
+from fastapi import APIRouter, Path, HTTPException
 
 from models import Todos
-from database import SessionLocal
-
-def get_db():
-    """
-    Connects to the database 
-    then closes its connection after use
-    """
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-# Dependency injection
-db_dependency = Annotated[Session, Depends(get_db)]
+from dependencies import db_dependency
 
 class TodoRequest(BaseModel):
     title: str = Field(min_length=2)
