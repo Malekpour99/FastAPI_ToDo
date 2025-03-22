@@ -1,17 +1,9 @@
-from typing import List, Optional
-
 from starlette import status
-from pydantic import BaseModel, Field
 from fastapi import APIRouter, Path, HTTPException
 
 from models.todos import Todos
+from schemas.todos import TodoRequest
 from dependencies import db_dependency
-
-class TodoRequest(BaseModel):
-    title: str = Field(min_length=2)
-    description: str = Field(min_length=3, max_length=100)
-    priority: int = Field(gt=0, lt=6)
-    complete: Optional[bool] = False
 
 router = APIRouter()
 

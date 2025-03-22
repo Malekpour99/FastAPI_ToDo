@@ -1,24 +1,14 @@
-from typing import Optional, Annotated
+from typing import Annotated
 
 from starlette import status
-from pydantic import BaseModel, Field
 from passlib.context import CryptContext
 from fastapi import APIRouter, Path, Depends, HTTPException
 
 from models.users import Users
 from dependencies import db_dependency
+from schemas.users import CreateUserRequest
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-class CreateUserRequest(BaseModel):
-    email: str = Field(min_length=6)
-    username: str = Field(min_length=1, max_length=20)
-    first_name: str = Field(min_length=1, max_length=30)
-    last_name: str = Field(min_length=1, max_length=30)
-    password: str = Field(min_length=8, max_length=100)
-    role: str = Field(min_length=1, max_length=30)
-    is_active: Optional[bool] = True
-
 
 router = APIRouter()
 
