@@ -5,14 +5,14 @@ from models.todos import Todos
 from schemas.todos import TodoRequest
 from dependencies import db_dependency
 
-router = APIRouter()
+router = APIRouter(prefix="/todos", tags=["To-dos"])
 
 @router.get("/", status_code=status.HTTP_200_OK)
 async def read_all_todos(db: db_dependency):
     """Returns all the to-do tasks from the database"""
     return db.query(Todos).all()
 
-@router.get("/todo/{todo_id}/", status_code=status.HTTP_200_OK)
+@router.get("/{todo_id}/", status_code=status.HTTP_200_OK)
 async def get_todo(db: db_dependency, todo_id: int = Path(gt=0)):
     """Returns desired to do task based on its ID"""
     todo_task = db.query(Todos).filter(Todos.id == todo_id).first()
@@ -20,14 +20,14 @@ async def get_todo(db: db_dependency, todo_id: int = Path(gt=0)):
         return todo_task
     raise HTTPException(status_code=404, detail="Not found")
 
-@router.post("/todo/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_todo(db: db_dependency, todo_request: TodoRequest) -> None:
     """Creates a new to-do task"""
     new_todo = Todos(**todo_request.dict())
     db.add(new_todo)
     db.commit()
 
-@router.put("/todo/{todo_id}/", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/{todo_id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo(
         db: db_dependency,
         todo_request: TodoRequest,
@@ -46,7 +46,7 @@ async def update_todo(
     db.add(todo_task)
     db.commit()
 
-@router.delete("/todo/{todo_id}/", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{todo_id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(
         db: db_dependency,
         todo_id: int = Path(gt=0),
