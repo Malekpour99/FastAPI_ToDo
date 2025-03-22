@@ -10,9 +10,9 @@ from schemas.users import CreateUserRequest
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-router = APIRouter()
+router = APIRouter(prefix="/users", tags=["Users"])
 
-@router.post("/user/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(
         db: db_dependency,
         create_user_request: CreateUserRequest,
