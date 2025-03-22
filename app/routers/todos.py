@@ -4,7 +4,7 @@ from starlette import status
 from pydantic import BaseModel, Field
 from fastapi import APIRouter, Path, HTTPException
 
-from models import Todos
+from models.todos import Todos
 from dependencies import db_dependency
 
 class TodoRequest(BaseModel):

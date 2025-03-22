@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 
-from models import Base
-from database import engine
 from routers import auth, todos
+from db.database import Base, engine
 
 # Creating database if it doesn't exist
 Base.metadata.create_all(bind=engine)

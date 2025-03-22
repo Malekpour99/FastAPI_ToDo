@@ -1,11 +1,11 @@
-from typing import Optional
+from typing import Optional, Annotated
 
 from starlette import status
 from pydantic import BaseModel, Field
 from passlib.context import CryptContext
-from fastapi import APIRouter, Path, HTTPException
+from fastapi import APIRouter, Path, Depends, HTTPException
 
-from models import Users
+from models.users import Users
 from dependencies import db_dependency
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -27,8 +27,9 @@ async def create_user(
         db: db_dependency,
         create_user_request: CreateUserRequest,
         ) -> None:
-    """Creating new users with hashed passwords"""
+    """Create new users"""
     user = Users(**create_user_request.model_dump())
+    # hashing user password
     user.password = bcrypt_context.hash(create_user_request.password)
     db.add(user)
     db.commit()
