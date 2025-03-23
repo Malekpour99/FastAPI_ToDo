@@ -1,3 +1,5 @@
 fastapi[standard]
 SQLAlchemy
 passlib[bcrypt]
+python-jose[cryptography]
+python-multipart
