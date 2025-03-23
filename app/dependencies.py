@@ -4,7 +4,6 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from db.database import SessionLocal
-from passlib.context import CryptContext
 
 def get_db():
     """
@@ -19,7 +18,4 @@ def get_db():
 
 # for Dependency injection
 db_dependency = Annotated[Session, Depends(get_db)]
-
-# for Hashing passwords
-bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
