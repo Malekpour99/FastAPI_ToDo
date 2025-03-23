@@ -1,12 +1,14 @@
 from typing import Annotated
 
+from jose import jwt
 from starlette import status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Path, Depends, HTTPException
 
 from models.users import Users
+from dependencies import db_dependency
+from core.security import hash_password
 from services.user_service import authenticate_user
-from dependencies import db_dependency, bcrypt_context
 from schemas.users import CreateUserRequest
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -19,7 +21,7 @@ async def create_user(
     """Create new users"""
     user = Users(**create_user_request.model_dump())
     # hashing user password
-    user.password = bcrypt_context.hash(create_user_request.password)
+    user.password = hash_password(password=create_user_request.password)
     db.add(user)
     db.commit()
 
@@ -30,6 +32,6 @@ async def get_tokens(
         ):
     user = authenticate_user(username=form_data.username, password=form_data.password, db=db)
     if not user:
-        raise HTTPException(status_code=401, detail="Authentication Failed")
+        raise HTTPException(status_code=400, detail="Incorrect Username or Password")
     return user
 
