@@ -1,6 +1,5 @@
 from typing import Annotated
 
-from jose import jwt
 from starlette import status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Path, Depends, HTTPException
@@ -8,8 +7,8 @@ from fastapi import APIRouter, Path, Depends, HTTPException
 from models.users import Users
 from dependencies import db_dependency
 from core.security import hash_password
-from services.user_service import authenticate_user
-from schemas.users import CreateUserRequest
+from services.user_service import authenticate_user, create_access_token
+from schemas.users import CreateUserRequest, Token
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -25,7 +24,7 @@ async def create_user(
     db.add(user)
     db.commit()
 
-@router.post("/token/", status_code=status.HTTP_200_OK)
+@router.post("/token/", response_model=Token, status_code=status.HTTP_200_OK)
 async def get_tokens(
         db: db_dependency,
         form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
@@ -33,5 +32,6 @@ async def get_tokens(
     user = authenticate_user(username=form_data.username, password=form_data.password, db=db)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect Username or Password")
-    return user
+    access_token = create_access_token(user=user, expires_delta=20)
+    return {"access_token": access_token, "token_type": "bearer"}
 
