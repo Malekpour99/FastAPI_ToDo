@@ -6,9 +6,8 @@ from fastapi import APIRouter, Path, Depends, HTTPException
 
 from models.users import Users
 from dependencies import db_dependency
-from core.security import hash_password
-from services.user_service import authenticate_user, create_access_token
 from schemas.users import CreateUserRequest, Token
+from core.security import hash_password, authenticate_user, create_access_token
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
