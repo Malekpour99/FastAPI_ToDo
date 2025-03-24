@@ -12,3 +12,8 @@ class CreateUserRequest(BaseModel):
     role: str = Field(min_length=1, max_length=30)
     is_active: Optional[bool] = True
 
+
+class Token(BaseModel):
+    access_token: str
+    token_type: Optional[str] = "bearer"
+
