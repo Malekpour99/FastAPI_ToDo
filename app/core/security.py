@@ -6,9 +6,9 @@ from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import status, Depends, HTTPException
 
-from models.users import Users
-from dependencies import db_dependency
-from core.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from app.models.users import Users
+from app.dependencies import db_dependency
+from .config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 # for Hashing passwords
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

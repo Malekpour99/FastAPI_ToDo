@@ -4,10 +4,10 @@ from starlette import status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Path, Depends, HTTPException
 
-from models.users import Users
-from dependencies import db_dependency
-from schemas.users import CreateUserRequest, Token
-from core.security import hash_password, authenticate_user, create_access_token
+from app.models.users import Users
+from app.dependencies import db_dependency
+from app.schemas.users import CreateUserRequest, Token
+from app.core.security import hash_password, authenticate_user, create_access_token
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
