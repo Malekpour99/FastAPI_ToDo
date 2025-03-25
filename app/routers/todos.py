@@ -1,16 +1,22 @@
+from typing import Annotated
+
 from starlette import status
-from fastapi import APIRouter, Path, HTTPException
+from fastapi import APIRouter, Path, Depends, HTTPException
 
 from app.models.todos import Todos
 from app.schemas.todos import TodoRequest
 from app.dependencies import db_dependency
+from app.services.user_service import get_current_user
+
+# for User dependency injection
+user_dependency = Annotated[dict, Depends(get_current_user)]
 
 router = APIRouter(prefix="/todos", tags=["To-dos"])
 
 @router.get("/", status_code=status.HTTP_200_OK)
-async def read_all_todos(db: db_dependency):
+async def read_all_todos(user: user_dependency, db: db_dependency):
     """Returns all the to-do tasks from the database"""
-    return db.query(Todos).all()
+    return db.query(Todos).filter(Todos.owner == user.get("id")).all()
 
 @router.get("/{todo_id}/", status_code=status.HTTP_200_OK)
 async def get_todo(db: db_dependency, todo_id: int = Path(gt=0)):
@@ -21,9 +27,19 @@ async def get_todo(db: db_dependency, todo_id: int = Path(gt=0)):
     raise HTTPException(status_code=404, detail="Not found")
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_todo(db: db_dependency, todo_request: TodoRequest) -> None:
+async def create_todo(
+        db: db_dependency,
+        user: user_dependency,
+        todo_request: TodoRequest
+        ) -> None:
     """Creates a new to-do task"""
-    new_todo = Todos(**todo_request.dict())
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    new_todo = Todos(**todo_request.dict(), owner=user.get("id"))
     db.add(new_todo)
     db.commit()
 
