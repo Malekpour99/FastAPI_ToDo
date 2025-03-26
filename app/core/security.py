@@ -1,4 +1,3 @@
-from typing import Union
 from datetime import datetime, timedelta
 
 from jose import jwt
@@ -6,7 +5,6 @@ from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 
 from app.models.users import Users
-from app.dependencies import db_dependency
 from .config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 # for Hashing passwords
@@ -22,15 +20,6 @@ def hash_password(*, password: str) -> str:
 def match_passwords(*, main_password: str, entered_password: str) -> bool:
     """Verifies password hashes are matched"""
     return pwd_context.verify(entered_password, main_password)
-
-def authenticate_user(*, username: str, password: str, db: db_dependency) -> Union[Users, bool]:
-    """Authenticate user by the provided credentials"""
-    user = db.query(Users).filter(Users.username == username).first()
-    if not user:
-        return False
-    if not match_passwords(main_password=user.password, entered_password=password):
-        return False
-    return user
 
 def create_access_token(*, user: Users, expires_delta: int = None) -> str:
     """Creates JWT access token"""
