@@ -6,9 +6,10 @@ from fastapi import APIRouter, Path, Depends, HTTPException
 
 from app.models.users import Users
 from app.dependencies import db_dependency
-from app.services.auth import authenticate_user
-from app.schemas.users import CreateUserRequest, Token
-from app.core.security import hash_password, create_access_token
+from app.common.exceptions import CREDENTIALS_EXCEPTION
+from app.services.auth import authenticate_user, user_dependency
+from app.core.security import hash_password, create_access_token, match_passwords
+from app.schemas.users import CreateUserRequest, Token, UserInfo, ChangePasswordRequest
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -34,4 +35,38 @@ async def get_tokens(
         raise HTTPException(status_code=400, detail="Incorrect Username or Password")
     access_token = create_access_token(user=user, expires_delta=20)
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/info/", response_model=UserInfo, status_code=status.HTTP_200_OK)
+async def get_user_info(user: user_dependency, db: db_dependency):
+    """Returns authenticated user's information"""
+    if not user:
+        raise CREDENTIALS_EXCEPTION
+
+    return db.query(Users).filter(Users.id == user.get("id")).first()
+
+@router.post("/change-password/", status_code=status.HTTP_204_NO_CONTENT)
+async def change_user_password(
+        user: user_dependency,
+        db: db_dependency,
+        change_password_request: ChangePasswordRequest
+        ) -> None:
+    """Change authenticated user's password"""
+    if not user:
+        raise CREDENTIALS_EXCEPTION
+
+    user_data = db.query(Users).filter(Users.id == user.get("id")).first()
+    # Wrong password
+    if not match_passwords(main_password=user_data.password, entered_password=change_password_request.old_password):
+        raise HTTPException(status_code=400, detail="Wrong password")
+    # Identical new passwrod and old password
+    if match_passwords(main_password=user_data.password, entered_password=change_password_request.new_password):
+        raise HTTPException(status_code=400, detail="New password can not be the same as your old password")
+    # Unmatched new passwords
+    if not change_password_request.new_password == change_password_request.new_password_confirm:
+        raise HTTPException(status_code=400, detail="New passwords & its confirmation didn't match")
+
+    user_data.password = hash_password(password=change_password_request.new_password)
+
+    db.add(user_data)
+    db.commit()
 
