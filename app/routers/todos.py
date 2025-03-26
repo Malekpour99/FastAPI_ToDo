@@ -80,6 +80,6 @@ async def delete_todo(
     if not todo_task:
         raise HTTPException(status_code=404, detail="Not found")
 
-    db.query(Todos).filter(Todos.id == todo_id).delete()
+    db.query(Todos).filter(Todos.owner == user.get("id")).filter(Todos.id == todo_id).delete()
     db.commit()
 
