@@ -1,5 +1,3 @@
-from typing import Annotated
-
 from starlette import status
 from fastapi import APIRouter, Path, Depends, HTTPException
 
