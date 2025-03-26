@@ -6,20 +6,20 @@ from fastapi import APIRouter, Path, Depends, HTTPException
 from app.models.todos import Todos
 from app.schemas.todos import TodoRequest
 from app.dependencies import db_dependency
-from app.services.user_service import get_current_user
-
-# for User dependency injection
-user_dependency = Annotated[dict, Depends(get_current_user)]
+from app.services.auth import user_dependency
+from app.common.exceptions import CREDENTIALS_EXCEPTION
 
 router = APIRouter(prefix="/todos", tags=["To-dos"])
 
 @router.get("/", status_code=status.HTTP_200_OK)
 async def read_all_todos(user: user_dependency, db: db_dependency):
     """Returns all the to-do tasks from the database"""
+    if not user:
+        raise CREDENTIALS_EXCEPTION
     return db.query(Todos).filter(Todos.owner == user.get("id")).all()
 
 @router.get("/{todo_id}/", status_code=status.HTTP_200_OK)
-async def get_todo(db: db_dependency, todo_id: int = Path(gt=0)):
+async def get_todo(user: user_dependency, db: db_dependency, todo_id: int = Path(gt=0)):
     """Returns desired to do task based on its ID"""
     todo_task = db.query(Todos).filter(Todos.id == todo_id).first()
     if todo_task:
@@ -34,11 +34,8 @@ async def create_todo(
         ) -> None:
     """Creates a new to-do task"""
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise CREDENTIALS_EXCEPTION
+
     new_todo = Todos(**todo_request.dict(), owner=user.get("id"))
     db.add(new_todo)
     db.commit()

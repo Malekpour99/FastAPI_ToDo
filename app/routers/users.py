@@ -6,8 +6,9 @@ from fastapi import APIRouter, Path, Depends, HTTPException
 
 from app.models.users import Users
 from app.dependencies import db_dependency
+from app.services.auth import authenticate_user
 from app.schemas.users import CreateUserRequest, Token
-from app.core.security import hash_password, authenticate_user, create_access_token
+from app.core.security import hash_password, create_access_token
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
