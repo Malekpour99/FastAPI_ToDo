@@ -6,4 +6,6 @@ python-multipart
 
 # for PostgreSQL database
 psycopg2-binary
+# for MySQL database
+pymysql
 
