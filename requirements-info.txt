@@ -3,3 +3,7 @@ SQLAlchemy
 passlib[bcrypt]
 python-jose[cryptography]
 python-multipart
+
+# for PostgreSQL database
+psycopg2-binary
+
