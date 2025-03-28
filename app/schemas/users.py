@@ -9,6 +9,7 @@ class CreateUserRequest(BaseModel):
     first_name: str = Field(min_length=1, max_length=30)
     last_name: str = Field(min_length=1, max_length=30)
     password: str = Field(min_length=8, max_length=100)
+    phone_number: str = Field(min_length=10, max_length=15)
     role: str = Field(min_length=1, max_length=30)
     is_active: Optional[bool] = True
 
@@ -18,6 +19,7 @@ class UserInfo(BaseModel):
     username: str = Field(min_length=1, max_length=20)
     first_name: str = Field(min_length=1, max_length=30)
     last_name: str = Field(min_length=1, max_length=30)
+    phone_number: Optional[str] = None
     role: str = Field(min_length=1, max_length=30)
     is_active: Optional[bool] = True
 
