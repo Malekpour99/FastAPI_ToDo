@@ -15,4 +15,3 @@ class Users(Base):
     phone_number = Column(String)
     is_active = Column(Boolean, default=True)
     role = Column(String)
-

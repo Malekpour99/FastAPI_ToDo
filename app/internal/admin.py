@@ -8,6 +8,7 @@ from app.common.exceptions import CREDENTIALS_EXCEPTION
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
+
 @router.get("/todo/", status_code=status.HTTP_200_OK)
 async def read_all(user: user_dependency, db: db_dependency):
     """Returns every available to do task for admin user"""
@@ -18,12 +19,11 @@ async def read_all(user: user_dependency, db: db_dependency):
 
     return db.query(Todos).all()
 
+
 @router.delete("/todo/{todo_id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(
-        user: user_dependency,
-        db: db_dependency,
-        todo_id: int = Path(gt=0)
-        ) -> None:
+    user: user_dependency, db: db_dependency, todo_id: int = Path(gt=0)
+) -> None:
     """Deletes desired to do task"""
     if not user:
         raise CREDENTIALS_EXCEPTION
@@ -36,4 +36,3 @@ async def delete_todo(
 
     db.query(Todos).filter(Todos.id == todo_id).delete()
     db.commit()
-

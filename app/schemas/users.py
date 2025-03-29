@@ -33,5 +33,3 @@ class ChangePasswordRequest(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: Optional[str] = "bearer"
-
-

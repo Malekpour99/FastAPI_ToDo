@@ -9,7 +9,10 @@ from app.core.config import SECRET_KEY, ALGORITHM
 from app.common.exceptions import CREDENTIALS_EXCEPTION
 from app.core.security import match_passwords, oauth2_scheme
 
-def authenticate_user(*, username: str, password: str, db: db_dependency) -> Union[Users, bool]:
+
+def authenticate_user(
+    *, username: str, password: str, db: db_dependency
+) -> Union[Users, bool]:
     """Authenticate user by the provided credentials"""
     user = db.query(Users).filter(Users.username == username).first()
     if not user:
@@ -17,6 +20,7 @@ def authenticate_user(*, username: str, password: str, db: db_dependency) -> Uni
     if not match_passwords(main_password=user.password, entered_password=password):
         return False
     return user
+
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     """Gets current user based on the decoded token"""
@@ -32,6 +36,6 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     except JWTError:
         raise CREDENTIALS_EXCEPTION
 
+
 # for User dependency injection
 user_dependency = Annotated[dict, Depends(get_current_user)]
-
