@@ -1,5 +1,5 @@
 from starlette import status
-from fastapi import APIRouter, Path, Depends, HTTPException
+from fastapi import APIRouter, Path, HTTPException
 
 from app.models.todos import Todos
 from app.schemas.todos import TodoRequest
@@ -19,7 +19,11 @@ async def read_all_todos(user: user_dependency, db: db_dependency):
 
 
 @router.get("/{todo_id}/", status_code=status.HTTP_200_OK)
-async def get_todo(user: user_dependency, db: db_dependency, todo_id: int = Path(gt=0)):
+async def get_todo(
+    user: user_dependency,
+    db: db_dependency,
+    todo_id: int = Path(gt=0),
+):
     """Returns desired to do task based on its ID"""
     if not user:
         raise CREDENTIALS_EXCEPTION

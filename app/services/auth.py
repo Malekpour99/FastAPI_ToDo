@@ -1,7 +1,7 @@
 from typing import Union, Annotated
 
+from fastapi import Depends
 from jose import jwt, JWTError
-from fastapi import status, Depends, HTTPException
 
 from app.models.users import Users
 from app.dependencies import db_dependency
@@ -17,7 +17,10 @@ def authenticate_user(
     user = db.query(Users).filter(Users.username == username).first()
     if not user:
         return False
-    if not match_passwords(main_password=user.password, entered_password=password):
+    if not match_passwords(
+        main_password=user.password,
+        entered_password=password,
+    ):
         return False
     return user
 

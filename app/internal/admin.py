@@ -1,5 +1,5 @@
 from starlette import status
-from fastapi import APIRouter, Path, Depends, HTTPException
+from fastapi import APIRouter, Path, HTTPException
 
 from app.models.todos import Todos
 from app.dependencies import db_dependency
@@ -15,7 +15,10 @@ async def read_all(user: user_dependency, db: db_dependency):
     if not user:
         raise CREDENTIALS_EXCEPTION
     if not user.get("role") == "admin":
-        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Permission Denied")
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail="Permission Denied",
+        )
 
     return db.query(Todos).all()
 
@@ -28,7 +31,10 @@ async def delete_todo(
     if not user:
         raise CREDENTIALS_EXCEPTION
     if not user.get("role") == "admin":
-        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Permission Denied")
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail="Permission Denied",
+        )
 
     todo_task = db.query(Todos).filter(Todos.id == todo_id).first()
     if not todo_task:
